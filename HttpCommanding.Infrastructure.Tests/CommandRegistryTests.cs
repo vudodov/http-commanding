@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
@@ -14,9 +15,9 @@ namespace HttpCommanding.Infrastructure.Tests
 
         class TestCommandHandler : ICommandHandler<TestCommand>
         {
-            public CommandResult HandleAsync(TestCommand command, CancellationToken token)
+            public Task<CommandResult> HandleAsync(TestCommand command, Guid commandId, CancellationToken token)
             {
-                return CommandResult.Success();
+                return Task.FromResult(CommandResult.Success());
             }
         }
 
@@ -26,9 +27,9 @@ namespace HttpCommanding.Infrastructure.Tests
 
         class AnotherTestCommandHandler : ICommandHandler<AnotherTestCommand>
         {
-            public CommandResult HandleAsync(AnotherTestCommand command, CancellationToken token)
+            public Task<CommandResult> HandleAsync(AnotherTestCommand command, Guid commandId, CancellationToken token)
             {
-                return CommandResult.Success();
+                return Task.FromResult(CommandResult.Success());
             }
         }
 

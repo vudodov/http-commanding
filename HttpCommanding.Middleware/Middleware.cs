@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,13 +8,12 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using HttpCommanding.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace HttpCommanding.Middleware
 {
@@ -23,8 +23,14 @@ namespace HttpCommanding.Middleware
         private const string CacheKeyCommandContracts = "command-contracts";
         private readonly ICommandRegistry _commandRegistry;
         private readonly IMemoryCache _memoryCache;
-
         private readonly RequestDelegate _next;
+
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            IgnoreNullValues = true,
+            PropertyNameCaseInsensitive = false
+        };
 
 
         public Middleware(RequestDelegate next, ICommandRegistry commandRegistry, IMemoryCache memoryCache)
@@ -36,39 +42,32 @@ namespace HttpCommanding.Middleware
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            var cancellationToken = httpContext.RequestAborted;
-            
-            httpContext.RequestServices
-            async Task ProcessPut()
+            async Task ProcessPut(string commandName)
             {
+                Guid commandId = Guid.NewGuid();
+                
                 async Task SetResponse(CommandResult result)
                 {
                     httpContext.Response.StatusCode =
                         (int) (result is Success ? HttpStatusCode.Accepted : HttpStatusCode.Forbidden);
-
-                    httpContext.Request.ContentType = MediaTypeNames.Application.Json;
-
-                    await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(
-                        result,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }));
+//TODO: enrich response with command id
+                    httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+                    httpContext.Response.BodyWriter.Write(
+                        JsonSerializer.SerializeToUtf8Bytes(result, _jsonSerializerOptions));
+                    httpContext.Response.Headers["Cache-Control"] = "no-cache";
                 }
 
-                var contentType = httpContext.Request.ContentType;
-                var commandName = contentType.Substring(CommandPrefixLength,
-                    contentType.IndexOf("+", StringComparison.InvariantCultureIgnoreCase) - CommandPrefixLength);
-                
-                using (var reader = new StreamReader(httpContext.Request.BodyReader.AsStream()))
-                {
-                    var commandType = _commandRegistry[commandName];
-                    var command = (ICommand) JsonConvert.DeserializeObject(await reader.ReadToEndAsync(), commandType);
-                    var response = await mediator.Send(command);
-                    await SetResponse(response);
-                }
+                var commandMap = _commandRegistry[commandName];
+
+                var response = await CommandHandlingTrigger.Trigger(
+                    commandMap.command, commandMap.commandHandler, commandId,
+                    httpContext.Request.BodyReader, httpContext.RequestServices,
+                    httpContext.RequestAborted);
+
+                await SetResponse(response);
             }
 
+/*
             async Task ProcessGet()
             {
                 string CalculateChecksum(byte[] bytes)
@@ -112,15 +111,15 @@ namespace HttpCommanding.Middleware
                 httpContext.Response.StatusCode = (int) HttpStatusCode.OK;
                 await httpContext.Response.Body.WriteAsync(bodyByteArray);
             }
-
-            var isPathCorrect = new[] {"/command", "/cmd"}.Any(path => path == httpContext.Request.Path.Value);
-
-            if (isPathCorrect)
+*/
+            var path = httpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if ((path[0] == "cmd" || path[0] == "command") && !string.IsNullOrWhiteSpace(path[1]))
                 try
                 {
-                    if (HttpMethods.IsPut(httpContext.Request.Method) &&
-                        httpContext.Request.ContentType.IsCommandContentType()) await ProcessPut();
-                    else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
+                    if (HttpMethods.IsPut(httpContext.Request.Method)
+                        && httpContext.Request.ContentType == MediaTypeNames.Application.Json)
+                        await ProcessPut(path[1]);
+                    //else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
                     else throw new HttpRequestException("HTTP method should be PUT or GET");
                 }
                 catch (Exception e)
@@ -131,4 +130,5 @@ namespace HttpCommanding.Middleware
             else
                 await _next.Invoke(httpContext);
         }
+    }
 }

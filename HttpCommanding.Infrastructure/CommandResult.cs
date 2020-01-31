@@ -28,6 +28,6 @@ namespace HttpCommanding.Infrastructure
         {
         }
 
-        public IEnumerable Reasons { get; set; }
+        public IEnumerable Reasons { get; internal set; }
     }
 }
