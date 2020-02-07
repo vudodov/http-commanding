@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 
 namespace HttpCommanding.Infrastructure
 {
@@ -6,28 +7,29 @@ namespace HttpCommanding.Infrastructure
     {
         public static CommandResult Success()
         {
-            return new Success();
+            return new Succeed();
         }
 
         public static CommandResult Failure(params string[] reasons)
         {
-            return new Failure {Reasons = reasons};
+            return new Failed (reasons);
         }
     }
 
-    public sealed class Success : CommandResult
+    public sealed class Succeed : CommandResult
     {
-        internal Success()
+        internal Succeed()
         {
         }
     }
 
-    public sealed class Failure : CommandResult
+    public sealed class Failed : CommandResult
     {
-        internal Failure()
+        internal Failed(IEnumerable<string> reasons)
         {
+            Reasons = reasons;
         }
 
-        public IEnumerable Reasons { get; internal set; }
+        public IEnumerable Reasons { get; }
     }
 }

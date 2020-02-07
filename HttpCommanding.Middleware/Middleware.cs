@@ -42,18 +42,19 @@ namespace HttpCommanding.Middleware
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            async Task ProcessPut(string commandName)
+            async Task ProcessPost(string commandName)
             {
                 Guid commandId = Guid.NewGuid();
                 
                 void SetResponse(CommandResult result)
                 {
-                    var httpCommandResult = HttpCommandResult.CreatedResult(result, commandId);
+                    var httpCommandResult = HttpCommandResponse.CreatedResult(result, commandId);
                     httpContext.Response.StatusCode = (int) httpCommandResult.ResponseCode;
                     
                     httpContext.Response.ContentType = MediaTypeNames.Application.Json;
                     httpContext.Response.BodyWriter.Write(
                         JsonSerializer.SerializeToUtf8Bytes(httpCommandResult, _jsonSerializerOptions));
+                    httpContext.Response.BodyWriter.Complete();
                     httpContext.Response.Headers["Cache-Control"] = "no-cache";
                 }
 
@@ -116,11 +117,13 @@ namespace HttpCommanding.Middleware
             if ((path[0] == "cmd" || path[0] == "command") && !string.IsNullOrWhiteSpace(path[1]))
                 try
                 {
-                    if (HttpMethods.IsPut(httpContext.Request.Method)
-                        && httpContext.Request.ContentType == MediaTypeNames.Application.Json)
-                        await ProcessPut(path[1]);
+                    if (HttpMethods.IsPost(httpContext.Request.Method))
+                        if (httpContext.Request.ContentType == MediaTypeNames.Application.Json)
+                            await ProcessPost(path[1]);
+                        else
+                            throw new HttpRequestException("Command content-type must be JSON");
                     //else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
-                    else throw new HttpRequestException("HTTP method should be PUT or GET");
+                    else throw new HttpRequestException("HTTP method should be POST or GET");
                 }
                 catch (Exception e)
                 {
