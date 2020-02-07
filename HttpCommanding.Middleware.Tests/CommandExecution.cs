@@ -1,47 +1,22 @@
-using System;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HttpCommanding.Infrastructure;
+using HttpCommanding.Middleware.Tests.MockedCommands;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using Xunit;
 
+#pragma warning disable 1998
+
 namespace HttpCommanding.Middleware.Tests
 {
-    public class TestSuccessfulCommand : ICommand
-    {
-        public string TestProperty { get; set; }
-    }
-
-    public class TestSuccessfulCommandHandler : ICommandHandler<TestSuccessfulCommand>
-    {
-        public Task<CommandResult> HandleAsync(TestSuccessfulCommand command, Guid commandId, CancellationToken token)
-        {
-            return Task.FromResult(CommandResult.Success());
-        }
-    }
-    
-    public class TestFailingCommand : ICommand
-    {
-        public string TestProperty { get; set; }
-    }
-
-    public class TestFailingCommandHandler : ICommandHandler<TestFailingCommand>
-    {
-        public Task<CommandResult> HandleAsync(TestFailingCommand command, Guid commandId, CancellationToken token)
-        {
-            return Task.FromResult(CommandResult.Failure("failure reason"));
-        }
-    }
-
     public class CommandExecution
     {
         [Fact]

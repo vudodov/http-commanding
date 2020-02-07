@@ -39,10 +39,11 @@ namespace HttpCommanding.Middleware
 
                 if (readResult.IsCompleted)
                 {
-                    var readCommandAsync = buffer.IsSingleSegment
-                        ? JsonSerializer.Deserialize(buffer.FirstSpan, commandType)
-                        : DeserializeSequence(buffer, commandType);
-                    return readCommandAsync;
+                    return buffer.IsEmpty
+                        ? null
+                        : buffer.IsSingleSegment
+                            ? JsonSerializer.Deserialize(buffer.FirstSpan, commandType)
+                            : DeserializeSequence(buffer, commandType);
                 }
             }
 
