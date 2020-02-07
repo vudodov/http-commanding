@@ -67,18 +67,18 @@ namespace HttpCommanding.Middleware.Tests
                 registryMock.Object,
                 Mock.Of<IMemoryCache>());
 
-            var bodyStream = new MemoryStream();
-            await bodyStream.WriteAsync(Encoding.UTF8.GetBytes(@"{""testProperty"": ""test"" }"));
-            bodyStream.Seek(0, SeekOrigin.Begin);
-            
+            var bodyRequestStream = new MemoryStream();
+            var bodyResponseStream = new MemoryStream();
+            await bodyRequestStream.WriteAsync(Encoding.UTF8.GetBytes(@"{""testProperty"": ""test"" }"));
+            bodyRequestStream.Seek(0, SeekOrigin.Begin);
+
             var httpContext = new DefaultHttpContext(new FeatureCollection
             {
-                [typeof(IHttpResponseBodyFeature)] = new HttpResponseFeature(),
+                [typeof(IHttpResponseBodyFeature)] = new StreamResponseBodyFeature(bodyResponseStream),
                 [typeof(IHttpResponseFeature)] = new HttpResponseFeature(),
                 [typeof(IHttpRequestFeature)] = new HttpRequestFeature
                 {
-                    
-                    Body = bodyStream,
+                    Body = bodyRequestStream,
                     Path = "/command/test-successful-command",
                     Method = HttpMethods.Put
                 },

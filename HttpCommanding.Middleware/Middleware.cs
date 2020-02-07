@@ -46,14 +46,14 @@ namespace HttpCommanding.Middleware
             {
                 Guid commandId = Guid.NewGuid();
                 
-                async Task SetResponse(CommandResult result)
+                void SetResponse(CommandResult result)
                 {
-                    httpContext.Response.StatusCode =
-                        (int) (result is Success ? HttpStatusCode.Accepted : HttpStatusCode.Forbidden);
-//TODO: enrich response with command id
+                    var httpCommandResult = HttpCommandResult.CreatedResult(result, commandId);
+                    httpContext.Response.StatusCode = (int) httpCommandResult.ResponseCode;
+                    
                     httpContext.Response.ContentType = MediaTypeNames.Application.Json;
                     httpContext.Response.BodyWriter.Write(
-                        JsonSerializer.SerializeToUtf8Bytes(result, _jsonSerializerOptions));
+                        JsonSerializer.SerializeToUtf8Bytes(httpCommandResult, _jsonSerializerOptions));
                     httpContext.Response.Headers["Cache-Control"] = "no-cache";
                 }
 
@@ -64,7 +64,7 @@ namespace HttpCommanding.Middleware
                     httpContext.Request.BodyReader, httpContext.RequestServices,
                     httpContext.RequestAborted);
 
-                await SetResponse(response);
+                SetResponse(response);
             }
 
 /*
