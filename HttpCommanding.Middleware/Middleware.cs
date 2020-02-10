@@ -15,12 +15,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using NJsonSchema;
 
 namespace HttpCommanding.Middleware
 {
     public class Middleware
     {
-        private const int CommandPrefixLength = 23;
         private const string CacheKeyCommandContracts = "command-contracts";
         private readonly ICommandRegistry _commandRegistry;
         private readonly IMemoryCache _memoryCache;
@@ -46,7 +46,7 @@ namespace HttpCommanding.Middleware
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            async Task ProcessPost(string commandName)
+            async Task ExecuteCommand(string commandName)
             {
                 Guid commandId = Guid.NewGuid();
 
@@ -65,7 +65,7 @@ namespace HttpCommanding.Middleware
 
                 var commandMap = _commandRegistry[commandName];
 
-                var response = await CommandHandlingTrigger.Trigger(
+                var response = await CommandHandlerExecutor.Execute(
                     commandMap.command, commandMap.commandHandler, commandId,
                     httpContext.Request.BodyReader, httpContext.RequestServices,
                     httpContext.RequestAborted);
@@ -73,7 +73,6 @@ namespace HttpCommanding.Middleware
                 SetResponse(response);
             }
 
-/*
             async Task ProcessGet()
             {
                 string CalculateChecksum(byte[] bytes)
@@ -85,24 +84,21 @@ namespace HttpCommanding.Middleware
                 }
 
                 if (!_memoryCache.TryGetValue(CacheKeyCommandContracts,
-                    out Dictionary<string, JSchema> commandContracts))
+                    out Dictionary<string, JsonSchema> commandContracts))
                 {
-                    commandContracts = new Dictionary<string, JSchema>();
-                    var generator = new JSchemaGenerator();
-
-                    foreach (var (commandName, commandType) in _commandRegistry)
+                    commandContracts = new Dictionary<string, JsonSchema>();
+                    
+                    foreach (var (commandName, commandType, commandHandler) in _commandRegistry)
                     {
-                        var schema = generator.Generate(commandType);
+                        var schema = JsonSchema.FromType(commandType);
                         commandContracts.Add(commandName, schema);
                     }
 
-                    using (var cacheEntry = _memoryCache.CreateEntry(CacheKeyCommandContracts))
-                    {
-                        cacheEntry.Value = commandContracts;
-                    }
+                    using var cacheEntry = _memoryCache.CreateEntry(CacheKeyCommandContracts);
+                    cacheEntry.Value = commandContracts;
                 }
 
-                var bodyByteArray = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(commandContracts));
+                var bodyByteArray = JsonSerializer.SerializeToUtf8Bytes(commandContracts, _jsonSerializerOptions);
 
                 var checksum = CalculateChecksum(bodyByteArray);
 
@@ -115,17 +111,31 @@ namespace HttpCommanding.Middleware
                 httpContext.Response.Headers[HeaderNames.ETag] = checksum;
                 httpContext.Response.ContentType = MediaTypeNames.Application.Json;
                 httpContext.Response.StatusCode = (int) HttpStatusCode.OK;
-                await httpContext.Response.Body.WriteAsync(bodyByteArray);
+                httpContext.Response.BodyWriter.Write(bodyByteArray);
+                httpContext.Response.BodyWriter.Complete();
             }
-*/
+
             var path = httpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            
+
             if ((path[0] == "cmd" || path[0] == "command") && !string.IsNullOrWhiteSpace(path[1]))
                 if (HttpMethods.IsPost(httpContext.Request.Method))
                     if (httpContext.Request.ContentType == MediaTypeNames.Application.Json)
-                        await ProcessPost(path[1]);
+                        try
+                        {
+                            await ExecuteCommand(path[1]);
+                        }
+                        catch (Exception exception)
+                        {
+                            _logger.LogError(exception, "Failed execute command");
+                            throw;
+                        }
                     else
-                        throw new HttpRequestException("Command content-type must be JSON");
+                    {
+                        var exception = new HttpRequestException("Command content-type must be JSON");
+                        _logger.LogError(exception, "Failed execute command");
+
+                        throw exception;
+                    }
                 //else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
                 else throw new HttpRequestException("HTTP method should be POST or GET");
             else

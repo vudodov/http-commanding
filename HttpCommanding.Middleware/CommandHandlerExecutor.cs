@@ -1,11 +1,8 @@
 using System;
 using System.Buffers;
-using System.IO;
 using System.IO.Pipelines;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using HttpCommanding.Infrastructure;
@@ -13,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HttpCommanding.Middleware
 {
-    internal static class CommandHandlingTrigger
+    internal static class CommandHandlerExecutor
     {
-        internal static async Task<CommandResult> Trigger(
+        internal static async Task<CommandResult> Execute(
             Type commandType, Type commandHandlerType, Guid commandId, PipeReader pipeReader,
             IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
