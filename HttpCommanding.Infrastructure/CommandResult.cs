@@ -25,11 +25,11 @@ namespace HttpCommanding.Infrastructure
 
     public sealed class Failed : CommandResult
     {
-        internal Failed(IEnumerable<string> reasons)
+        internal Failed(IList<string> reasons)
         {
             Reasons = reasons;
         }
 
-        public IEnumerable Reasons { get; }
+        public IList<string> Reasons { get; }
     }
 }

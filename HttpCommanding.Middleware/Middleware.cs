@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using HttpCommanding.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 namespace HttpCommanding.Middleware
@@ -24,6 +25,7 @@ namespace HttpCommanding.Middleware
         private readonly ICommandRegistry _commandRegistry;
         private readonly IMemoryCache _memoryCache;
         private readonly RequestDelegate _next;
+        private readonly ILogger _logger;
 
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -33,11 +35,13 @@ namespace HttpCommanding.Middleware
         };
 
 
-        public Middleware(RequestDelegate next, ICommandRegistry commandRegistry, IMemoryCache memoryCache)
+        public Middleware(RequestDelegate next, ICommandRegistry commandRegistry, IMemoryCache memoryCache,
+            ILoggerFactory loggerFactory)
         {
             _next = next;
             _commandRegistry = commandRegistry;
             _memoryCache = memoryCache;
+            _logger = loggerFactory.CreateLogger<HttpCommanding.Middleware.Middleware>();
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -45,15 +49,16 @@ namespace HttpCommanding.Middleware
             async Task ProcessPost(string commandName)
             {
                 Guid commandId = Guid.NewGuid();
-                
+
                 void SetResponse(CommandResult result)
                 {
                     var httpCommandResult = HttpCommandResponse.CreatedResult(result, commandId);
                     httpContext.Response.StatusCode = (int) httpCommandResult.ResponseCode;
-                    
+
                     httpContext.Response.ContentType = MediaTypeNames.Application.Json;
                     httpContext.Response.BodyWriter.Write(
-                        JsonSerializer.SerializeToUtf8Bytes(httpCommandResult, _jsonSerializerOptions));
+                        JsonSerializer.SerializeToUtf8Bytes(httpCommandResult, httpCommandResult.GetType(),
+                            _jsonSerializerOptions));
                     httpContext.Response.BodyWriter.Complete();
                     httpContext.Response.Headers["Cache-Control"] = "no-cache";
                 }
@@ -114,22 +119,15 @@ namespace HttpCommanding.Middleware
             }
 */
             var path = httpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            
             if ((path[0] == "cmd" || path[0] == "command") && !string.IsNullOrWhiteSpace(path[1]))
-                try
-                {
-                    if (HttpMethods.IsPost(httpContext.Request.Method))
-                        if (httpContext.Request.ContentType == MediaTypeNames.Application.Json)
-                            await ProcessPost(path[1]);
-                        else
-                            throw new HttpRequestException("Command content-type must be JSON");
-                    //else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
-                    else throw new HttpRequestException("HTTP method should be POST or GET");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                if (HttpMethods.IsPost(httpContext.Request.Method))
+                    if (httpContext.Request.ContentType == MediaTypeNames.Application.Json)
+                        await ProcessPost(path[1]);
+                    else
+                        throw new HttpRequestException("Command content-type must be JSON");
+                //else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
+                else throw new HttpRequestException("HTTP method should be POST or GET");
             else
                 await _next.Invoke(httpContext);
         }

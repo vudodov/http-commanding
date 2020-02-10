@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.Json.Serialization;
 
@@ -33,13 +34,13 @@ namespace HttpCommanding.Middleware
 
     public sealed class HttpCommandRejectedResponse : HttpCommandResponse
     {
-        internal HttpCommandRejectedResponse(Guid commandId, IEnumerable reasons)
+        internal HttpCommandRejectedResponse(Guid commandId, IList<string> reasons)
         {
             _commandId = commandId;
             Reasons = reasons;
             _responseCode = HttpStatusCode.Forbidden;
         }
 
-        public IEnumerable Reasons { get; }
+        public IList<string> Reasons { get; }
     }
 }

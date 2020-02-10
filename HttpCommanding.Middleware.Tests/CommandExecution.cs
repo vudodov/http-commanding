@@ -10,6 +10,7 @@ using HttpCommanding.Middleware.Tests.MockedCommands;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -30,7 +31,8 @@ namespace HttpCommanding.Middleware.Tests
             var middleware = new Middleware(
                 async context => { },
                 registryMock.Object,
-                Mock.Of<IMemoryCache>());
+                Mock.Of<IMemoryCache>(),
+                Mock.Of<ILoggerFactory>());
 
             var bodyRequestStream = new MemoryStream();
             var bodyResponseStream = new MemoryStream();
@@ -73,7 +75,8 @@ namespace HttpCommanding.Middleware.Tests
             var middleware = new Middleware(
                 async context => { },
                 registryMock.Object,
-                Mock.Of<IMemoryCache>());
+                Mock.Of<IMemoryCache>(),
+                Mock.Of<ILoggerFactory>());
 
             var bodyRequestStream = new MemoryStream();
             var bodyResponseStream = new MemoryStream();
