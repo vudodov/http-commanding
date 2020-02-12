@@ -7,7 +7,7 @@
         <PackageId>http-commanding-infrastructure</PackageId>
         <RepositoryUrl>https://github.com/vudodov/http-commanding</RepositoryUrl>
         <Authors>Valerii Udodov</Authors>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
