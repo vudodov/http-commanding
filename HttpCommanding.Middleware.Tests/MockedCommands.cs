@@ -5,6 +5,7 @@ using HttpCommanding.Infrastructure;
 
 namespace HttpCommanding.Middleware.Tests.MockedCommands
 {
+    // md5: HGfGbyN2o2ta0l4csiITYQ==
     public class TestSuccessfulCommand : ICommand
     {
         public string TestProperty { get; set; }

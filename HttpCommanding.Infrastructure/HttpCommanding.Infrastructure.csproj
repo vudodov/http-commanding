@@ -2,6 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <OutputType>Library</OutputType>
+        <Nullable>enable</Nullable>
+        <PackageId>http-commanding-infrastructure</PackageId>
+        <RepositoryUrl>https://github.com/vudodov/http-commanding</RepositoryUrl>
+        <Authors>Valerii Udodov</Authors>
+        <Version>1.0.0</Version>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
 </Project>

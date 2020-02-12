@@ -18,10 +18,10 @@ using Xunit;
 
 namespace HttpCommanding.Middleware.Tests
 {
-    public class CommandExecution
+    public class WhenExecutingCommand
     {
         [Fact]
-        public async Task Succeed()
+        public async Task It_should_succeed_if_handler_finished_successfully()
         {
             var registryMock = new Mock<ICommandRegistry>();
             registryMock.SetupGet(p => p["test-successful-command"])
@@ -65,7 +65,7 @@ namespace HttpCommanding.Middleware.Tests
         }
         
         [Fact]
-        public async Task Failed()
+        public async Task It_should_fail_if_handler_finished_unsuccessfully()
         {
             var registryMock = new Mock<ICommandRegistry>();
             registryMock.SetupGet(p => p["test-failing-command"])

@@ -1,13 +1,10 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HttpCommanding.Infrastructure;
@@ -30,6 +27,7 @@ namespace HttpCommanding.Middleware
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
             IgnoreNullValues = true,
             PropertyNameCaseInsensitive = false
         };
@@ -73,7 +71,7 @@ namespace HttpCommanding.Middleware
                 SetResponse(response);
             }
 
-            async Task ProcessGet()
+            void ProcessGet()
             {
                 string CalculateChecksum(byte[] bytes)
                 {
@@ -84,14 +82,14 @@ namespace HttpCommanding.Middleware
                 }
 
                 if (!_memoryCache.TryGetValue(CacheKeyCommandContracts,
-                    out Dictionary<string, string> commandContracts))
+                    out Dictionary<string, JsonElement> commandContracts))
                 {
-                    commandContracts = new Dictionary<string, string>();
+                    commandContracts = new Dictionary<string, JsonElement>();
 
                     foreach (var (commandName, commandType, commandHandler) in _commandRegistry)
                     {
                         var schema = JsonSchema.FromType(commandType);
-                        commandContracts.Add(commandName, schema.ToJson());
+                        commandContracts.Add(commandName, JsonDocument.Parse(schema.ToJson()).RootElement);
                     }
 
                     using var cacheEntry = _memoryCache.CreateEntry(CacheKeyCommandContracts);
@@ -117,7 +115,7 @@ namespace HttpCommanding.Middleware
 
             var path = httpContext.Request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-            if ((path[0] == "cmd" || path[0] == "command"))
+            if (path[0] == "cmd" || path[0] == "command")
                 if (HttpMethods.IsPost(httpContext.Request.Method))
                     if (httpContext.Request.ContentType == MediaTypeNames.Application.Json &&
                         !string.IsNullOrWhiteSpace(path[1]))
@@ -139,7 +137,7 @@ namespace HttpCommanding.Middleware
 
                         throw exception;
                     }
-                else if (HttpMethods.IsGet(httpContext.Request.Method)) await ProcessGet();
+                else if (HttpMethods.IsGet(httpContext.Request.Method)) ProcessGet();
                 else throw new HttpRequestException("HTTP method should be POST or GET");
             else
                 await _next.Invoke(httpContext);

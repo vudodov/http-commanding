@@ -15,10 +15,10 @@ using Xunit;
 
 namespace HttpCommanding.Middleware.Tests
 {
-    public class MiddlewareBehaviour
+    public class When_middleware_is_executing
     {
         [Fact]
-        public async Task When_command_passed_It_should_terminate_the_pipeline()
+        public async Task It_should_terminate_the_pipeline_if_command_passed()
         {
             var registryMock = new Mock<ICommandRegistry>();
             registryMock.SetupGet(p => p["test-successful-command"])
@@ -44,7 +44,7 @@ namespace HttpCommanding.Middleware.Tests
         }
         
         [Fact]
-        public async Task When_not_command_passed_It_should_execute_next_middleware()
+        public async Task It_should_execute_next_middleware_if_no_command_passed()
         {
             var registryMock = new Mock<ICommandRegistry>();
             registryMock.SetupGet(p => p["test-successful-command"])
@@ -70,16 +70,15 @@ namespace HttpCommanding.Middleware.Tests
         }
         
         [Fact]
-        public async Task When_wrong_http_method_is_called_It_should_throw_http_exception()
+        public async Task It_should_throw_http_exception_if_wrong_http_method_is_called()
         {
             var registryMock = new Mock<ICommandRegistry>();
             registryMock.SetupGet(p => p["test-successful-command"])
                 .Returns((command: typeof(TestSuccessfulCommand),
                     commandHandler: typeof(TestSuccessfulCommandHandler)));
-            var nextFlag = false;
-           
+            
             var middleware = new Middleware(
-                async context => nextFlag = true,
+                async _ => { },
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),
                 Mock.Of<ILoggerFactory>());

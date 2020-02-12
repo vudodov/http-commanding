@@ -17,15 +17,21 @@ namespace HttpCommanding.Middleware
             IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             object commandHandlerInstance = ActivatorUtilities.CreateInstance(serviceProvider, commandHandlerType);
-            MethodInfo handleAsyncMethod = commandHandlerType.GetMethod("HandleAsync");
+            MethodInfo? handleAsyncMethod = commandHandlerType.GetMethod("HandleAsync");
+            
+            if (handleAsyncMethod == null) throw new MissingMethodException(nameof(commandHandlerType), "HandleAsync");
 
             var command = await ReadCommandAsync(pipeReader, commandType, cancellationToken);
 
-            return await (Task<CommandResult>) handleAsyncMethod.Invoke(commandHandlerInstance,
+            var commandResult = handleAsyncMethod.Invoke(commandHandlerInstance,
                 new[] {command, commandId, cancellationToken});
+            
+            if (commandResult == null) throw new NullReferenceException("Command result cannot be null.");
+
+            return await (Task<CommandResult>) commandResult;
         }
 
-        private static async Task<object> ReadCommandAsync(
+        private static async Task<object?> ReadCommandAsync(
             PipeReader pipeReader, Type commandType, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
