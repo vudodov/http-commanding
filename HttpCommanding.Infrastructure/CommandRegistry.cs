@@ -21,7 +21,7 @@ namespace HttpCommanding.Infrastructure
             {
                 if (_mapping.TryGetValue(command.ToLowerInvariant(), out var map))
                     return map;
-                throw new KeyNotFoundException($"Command {map} was not found.");
+                throw new KeyNotFoundException($"Command {command} was not found.");
             }
         }
 

@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpCommanding.Middleware",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpCommanding.Middleware.Tests", "HttpCommanding.Middleware.Tests\HttpCommanding.Middleware.Tests.csproj", "{C047D6A4-A7CA-485F-A161-518E30385709}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpCommanding.Playground", "HttpCommanding.Playground\HttpCommanding.Playground.csproj", "{E0F583B3-6839-4B82-9026-5B2688AE21C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpCommanding.Playground.Tests", "HttpCommanding.Playground.Tests\HttpCommanding.Playground.Tests.csproj", "{9EEBD8AA-16FB-44EB-9B16-7A21842C19A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{C047D6A4-A7CA-485F-A161-518E30385709}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C047D6A4-A7CA-485F-A161-518E30385709}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C047D6A4-A7CA-485F-A161-518E30385709}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F583B3-6839-4B82-9026-5B2688AE21C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F583B3-6839-4B82-9026-5B2688AE21C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F583B3-6839-4B82-9026-5B2688AE21C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F583B3-6839-4B82-9026-5B2688AE21C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EEBD8AA-16FB-44EB-9B16-7A21842C19A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EEBD8AA-16FB-44EB-9B16-7A21842C19A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EEBD8AA-16FB-44EB-9B16-7A21842C19A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EEBD8AA-16FB-44EB-9B16-7A21842C19A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -6,9 +6,13 @@
         <Nullable>enable</Nullable>
         <PackageId>http-commanding-middleware</PackageId>
         <RepositoryUrl>https://github.com/vudodov/http-commanding</RepositoryUrl>
-        <Authors>Valerii Udodov</Authors>
+        <Authors>Valerii Udodov &lt;vudodov@gmail.com&gt;</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
+        <PackageVersion>1.0.2</PackageVersion>
+        <Title>HTTP Commanding Middleware</Title>
+        <PackageLicenseUrl>MIT</PackageLicenseUrl>
+        <PackageTags>cqrs, commanding, http</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

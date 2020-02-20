@@ -66,7 +66,7 @@ namespace HttpCommanding.Middleware
                 var response = await CommandHandlerExecutor.Execute(
                     commandMap.command, commandMap.commandHandler, commandId,
                     httpContext.Request.BodyReader, httpContext.RequestServices,
-                    httpContext.RequestAborted);
+                    httpContext.RequestAborted, _jsonSerializerOptions);
 
                 SetResponse(response);
             }
@@ -117,7 +117,7 @@ namespace HttpCommanding.Middleware
 
             if (path[0] == "cmd" || path[0] == "command")
                 if (HttpMethods.IsPost(httpContext.Request.Method))
-                    if (httpContext.Request.ContentType == MediaTypeNames.Application.Json &&
+                    if (httpContext.Request.ContentType.StartsWith(MediaTypeNames.Application.Json) &&
                         !string.IsNullOrWhiteSpace(path[1]))
                         try
                         {
