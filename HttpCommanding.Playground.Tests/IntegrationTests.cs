@@ -21,24 +21,24 @@ namespace HttpCommanding.Playground.Tests
         public async Task ExecuteSuccessfulCommand()
         {
             var response = await _client.SendCommandAsync("successful-command", "{}");
-            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
         
         [Fact]
         public async Task ExecuteFailedCommand()
         {
             var response = await _client.SendCommandAsync("failed-command", "{}");
-            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
 
         [Fact]
         public async Task ExecuteCommandWithLogic()
         {
-            var response = await _client.SendCommandAsync("condition-command", "{ succeed: true }");
-            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            var response = await _client.SendCommandAsync("condition-command", @"{ ""succeed"": true }");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             
-            response = await _client.SendCommandAsync("condition-command", "{ succeed: false }");
-            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            response = await _client.SendCommandAsync("condition-command", @"{ ""succeed"": false }");
+            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
     }
 }

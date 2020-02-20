@@ -20,6 +20,8 @@ namespace HttpCommanding.Middleware
                 : (HttpCommandResponse) new HttpCommandRejectedResponse(commandId,
                     ((Infrastructure.Failed) commandResult).Reasons);
         }
+        
+        
     }
 
     public sealed class HttpCommandSucceedResponse : HttpCommandResponse
@@ -27,7 +29,7 @@ namespace HttpCommanding.Middleware
         internal HttpCommandSucceedResponse(Guid commandId)
         {
             _commandId = commandId;
-            _responseCode = HttpStatusCode.Accepted;
+            _responseCode = HttpStatusCode.OK;
         }
     }
 
@@ -37,7 +39,7 @@ namespace HttpCommanding.Middleware
         {
             _commandId = commandId;
             Reasons = reasons;
-            _responseCode = HttpStatusCode.Forbidden;
+            _responseCode = HttpStatusCode.Conflict;
         }
 
         public IList<string> Reasons { get; }

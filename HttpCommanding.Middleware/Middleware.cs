@@ -66,7 +66,7 @@ namespace HttpCommanding.Middleware
                 var response = await CommandHandlerExecutor.Execute(
                     commandMap.command, commandMap.commandHandler, commandId,
                     httpContext.Request.BodyReader, httpContext.RequestServices,
-                    httpContext.RequestAborted);
+                    httpContext.RequestAborted, _jsonSerializerOptions);
 
                 SetResponse(response);
             }

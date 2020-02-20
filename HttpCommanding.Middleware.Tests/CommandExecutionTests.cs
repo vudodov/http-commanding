@@ -58,7 +58,7 @@ namespace HttpCommanding.Middleware.Tests
             bodyResponseStream.Position = 0;
             var bodyContent = await new StreamReader(bodyResponseStream).ReadToEndAsync();
             
-            httpContext.Response.StatusCode.Should().Be((int) HttpStatusCode.Accepted);
+            httpContext.Response.StatusCode.Should().Be((int) HttpStatusCode.OK);
             JsonDocument.Parse(bodyContent).RootElement
                 .GetProperty("commandId").GetGuid()
                 .Should().NotBeEmpty();
@@ -102,7 +102,7 @@ namespace HttpCommanding.Middleware.Tests
             bodyResponseStream.Position = 0;
             var bodyContent = await new StreamReader(bodyResponseStream).ReadToEndAsync();
 
-            httpContext.Response.StatusCode.Should().Be((int) HttpStatusCode.Forbidden);
+            httpContext.Response.StatusCode.Should().Be((int) HttpStatusCode.Conflict);
             JsonDocument.Parse(bodyContent).RootElement
                 .GetProperty("reasons")[0].GetString()
                 .Should().Be("failure reason");

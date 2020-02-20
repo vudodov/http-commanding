@@ -12,16 +12,17 @@ namespace HttpCommanding.Middleware
 {
     internal static class CommandHandlerExecutor
     {
-        internal static async Task<CommandResult> Execute(
-            Type commandType, Type commandHandlerType, Guid commandId, PipeReader pipeReader,
-            IServiceProvider serviceProvider, CancellationToken cancellationToken)
+        internal static async Task<CommandResult> Execute(Type commandType, Type commandHandlerType, Guid commandId,
+            PipeReader pipeReader,
+            IServiceProvider serviceProvider, CancellationToken cancellationToken,
+            JsonSerializerOptions jsonSerializerOptions)
         {
             object commandHandlerInstance = ActivatorUtilities.CreateInstance(serviceProvider, commandHandlerType);
             MethodInfo? handleAsyncMethod = commandHandlerType.GetMethod("HandleAsync");
             
             if (handleAsyncMethod == null) throw new MissingMethodException(nameof(commandHandlerType), "HandleAsync");
 
-            var command = await ReadCommandAsync(pipeReader, commandType, cancellationToken);
+            var command = await ReadCommandAsync(pipeReader, commandType, jsonSerializerOptions, cancellationToken);
 
             var commandResult = handleAsyncMethod.Invoke(commandHandlerInstance,
                 new[] {command, commandId, cancellationToken});
@@ -31,8 +32,8 @@ namespace HttpCommanding.Middleware
             return await (Task<CommandResult>) commandResult;
         }
 
-        private static async Task<object?> ReadCommandAsync(
-            PipeReader pipeReader, Type commandType, CancellationToken cancellationToken)
+        private static async Task<object?> ReadCommandAsync(PipeReader pipeReader, Type commandType,
+            JsonSerializerOptions jsonSerializerOptions, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -45,7 +46,7 @@ namespace HttpCommanding.Middleware
                     return buffer.IsEmpty
                         ? null
                         : buffer.IsSingleSegment
-                            ? JsonSerializer.Deserialize(buffer.FirstSpan, commandType)
+                            ? JsonSerializer.Deserialize(buffer.FirstSpan, commandType, jsonSerializerOptions)
                             : DeserializeSequence(buffer, commandType);
                 }
             }
