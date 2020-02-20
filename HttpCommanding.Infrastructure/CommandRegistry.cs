@@ -10,6 +10,10 @@ namespace HttpCommanding.Infrastructure
     {
         private readonly IDictionary<string, (Type command, Type commandHandler)> _mapping;
 
+        public CommandRegistry() : this(new[] {Assembly.GetCallingAssembly()})
+        {
+        }
+
         public CommandRegistry(IEnumerable<Assembly> assemblies)
         {
             _mapping = Scan(assemblies);
@@ -52,16 +56,16 @@ namespace HttpCommanding.Infrastructure
 
                     foreach (var commandType in discoveredCommandTypes)
                     {
-                        bool GetCommandHandlerInterfacePredicate(Type @interface) => 
-                            @interface.IsGenericType 
-                            && @interface.GetGenericTypeDefinition() == typeof(ICommandHandler<>) 
+                        bool GetCommandHandlerInterfacePredicate(Type @interface) =>
+                            @interface.IsGenericType
+                            && @interface.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
                             && @interface.GetGenericArguments().Single().IsAssignableFrom(commandType);
 
                         var handlerType =
                             assembly.GetTypes()
                                 .Single(type => type.GetInterfaces()
                                     .Any(GetCommandHandlerInterfacePredicate));
-                        
+
                         commandHandlerMapping.Add((command: commandType, commandHandler: handlerType));
                     }
                 }

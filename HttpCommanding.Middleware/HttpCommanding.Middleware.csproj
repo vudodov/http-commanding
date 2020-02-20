@@ -9,7 +9,7 @@
         <Authors>Valerii Udodov &lt;vudodov@gmail.com&gt;</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
-        <PackageVersion>1.0.2</PackageVersion>
+        <PackageVersion>1.0.3</PackageVersion>
         <Title>HTTP Commanding Middleware</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>cqrs, commanding, http</PackageTags>
