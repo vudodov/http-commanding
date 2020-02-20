@@ -20,8 +20,7 @@ namespace HttpCommanding.Playground
         public void ConfigureServices(IServiceCollection services)
         {
             var commandAssembly = typeof(SuccessfulCommand).Assembly;
-            services.AddSingleton<ICommandRegistry>(new CommandRegistry(new[] {commandAssembly}));
-            services.AddMemoryCache();
+            services.AddHttpCommanding(commandAssembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
