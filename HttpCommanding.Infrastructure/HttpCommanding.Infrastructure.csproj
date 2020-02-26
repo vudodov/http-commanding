@@ -9,10 +9,12 @@
         <Authors>Valerii Udodov</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
-        <PackageVersion>1.0.5</PackageVersion>
+        <PackageVersion>1.0.6</PackageVersion>
         <Title>HTTP Commanding Infrastructure</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>cqrs, commanding, http</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
 </Project>
