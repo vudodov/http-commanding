@@ -25,7 +25,16 @@ jobs:
       run: nuget sources add -name "GPR" -Source https://nuget.pkg.github.com/vudodov/index.json -Username vudodov -Password ${{ secrets.GITHUB_TOKEN }} 
     - name: Pack
       run: dotnet pack --output ./nupkg/
-    - name: Push Infrastructure
+    - name: Push Infrastructure to GitHub
       run: nuget push **/nupkg/http-commanding-infrastructure.*.nupkg -source "GPR" -SkipDuplicate
-    - name: Push Middleware
+    - name: Push Middleware to GitHub
       run: nuget push **/nupkg/http-commanding-middleware.*.nupkg -source "GPR" -SkipDuplicate
+    - name: Push Infrastructure to NuGet
+      env:
+        NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push **/nupkg/http-commanding-infrastructure.*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
+    - name: Push Middleware to NuGet
+      env:
+        NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push **/nupkg/http-commanding-middleware.*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
+      
