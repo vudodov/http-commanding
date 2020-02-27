@@ -1,3 +1,6 @@
+![Nuget](https://img.shields.io/nuget/v/http-commanding-infrastructure?label=nuget-infrastructure)
+
+![Nuget](https://img.shields.io/nuget/v/http-commanding-middleware?label=nuget-middleware)
 # HTTP Commanding Middleware
 
 This is an easy-to-hook-up high-performance middleware for Web Applications aiming to implement the CQRS pattern. The Middleware provides tooling that will make your Web Application set up seamless and development efficient.
