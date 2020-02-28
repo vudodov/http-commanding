@@ -1,9 +1,11 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -74,9 +76,22 @@ namespace HttpCommanding.Middleware
                 }
                 catch (AggregateException aggregateException)
                 {
-                    aggregateException.Handle(e => e is CommandExecutionException);
-                    _logger.LogError(innerException.Message);
-                    SetResponse(CommandResult.Failure(innerException.Message));
+                    aggregateException.Handle(innerException =>
+                    {
+                        if (innerException is CommandExecutionException)
+                        {
+                            _logger.LogError(innerException.Message);
+                            SetResponse(CommandResult.Failure(innerException.Message));
+                            return true;
+                        }
+
+                        return false;
+                    });
+                }
+                catch (TargetInvocationException e) when (e.InnerException is CommandExecutionException)
+                {
+                   // _logger.LogError(e.InnerException.Message);
+                    SetResponse(CommandResult.Failure(e.InnerException.Message));
                 }
             }
 
