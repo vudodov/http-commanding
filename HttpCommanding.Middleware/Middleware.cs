@@ -63,12 +63,21 @@ namespace HttpCommanding.Middleware
 
                 var commandMap = _commandRegistry[commandName];
 
-                var response = await CommandHandlerExecutor.Execute(
-                    commandMap.command, commandMap.commandHandler, commandId,
-                    httpContext.Request.BodyReader, httpContext.RequestServices,
-                    httpContext.RequestAborted, _jsonSerializerOptions);
+                try
+                {
+                    var response = await CommandHandlerExecutor.Execute(
+                        commandMap.command, commandMap.commandHandler, commandId,
+                        httpContext.Request.BodyReader, httpContext.RequestServices,
+                        httpContext.RequestAborted, _jsonSerializerOptions);
 
-                SetResponse(response);
+                    SetResponse(response);
+                }
+                catch (AggregateException aggregateException)
+                {
+                    aggregateException.Handle(e => e is CommandExecutionException);
+                    _logger.LogError(innerException.Message);
+                    SetResponse(CommandResult.Failure(innerException.Message));
+                }
             }
 
             void ProcessGet()

@@ -107,5 +107,45 @@ namespace HttpCommanding.Middleware.Tests
                 .GetProperty("reasons")[0].GetString()
                 .Should().Be("failure reason");
         }
+        
+        [Fact]
+        public async Task It_should_fail_if_handler_throws_command_exception()
+        {
+            var registryMock = new Mock<ICommandRegistry>();
+            registryMock.SetupGet(p => p["test-failing-command"])
+                .Returns((command: typeof(TestThrowingCommand),
+                    commandHandler: typeof(TestThrowingCommandHandler)));
+
+            var middleware = new Middleware(
+                async context => { },
+                registryMock.Object,
+                Mock.Of<IMemoryCache>(),
+                Mock.Of<ILoggerFactory>());
+
+            var bodyResponseStream = new MemoryStream();
+            
+            var httpContext = new DefaultHttpContext(new FeatureCollection
+            {
+                [typeof(IHttpResponseBodyFeature)] = new StreamResponseBodyFeature(bodyResponseStream),
+                [typeof(IHttpResponseFeature)] = new HttpResponseFeature(),
+                [typeof(IHttpRequestFeature)] = new HttpRequestFeature
+                {
+                    Path = "/command/test-failing-command",
+                    Method = HttpMethods.Post
+                },
+            });
+
+            httpContext.Request.ContentType = MediaTypeNames.Application.Json;
+
+            await middleware.InvokeAsync(httpContext);
+            
+            bodyResponseStream.Position = 0;
+            var bodyContent = await new StreamReader(bodyResponseStream).ReadToEndAsync();
+
+            httpContext.Response.StatusCode.Should().Be((int) HttpStatusCode.Conflict);
+            JsonDocument.Parse(bodyContent).RootElement
+                .GetProperty("reasons")[0].GetString()
+                .Should().Be("exception message");
+        }
     }
 }

@@ -31,4 +31,17 @@ namespace HttpCommanding.Middleware.Tests.MockedCommands
             return Task.FromResult(CommandResult.Failure("failure reason"));
         }
     }
+    
+    public class TestThrowingCommand : ICommand
+    {
+    }
+    
+    public class TestThrowingCommandHandler : ICommandHandler<TestFailingCommand>
+    {
+        public Task<CommandResult> HandleAsync(TestFailingCommand command, Guid commandId, CancellationToken token)
+        {
+            throw new CommandExecutionException("exception message");
+            return Task.FromResult(CommandResult.Success());
+        }
+    }
 }
