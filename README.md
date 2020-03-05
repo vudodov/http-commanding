@@ -104,7 +104,7 @@ The request should have
  - `content-type` header set to `application/json`;
  Don't forget to include command payload in the request body ;)
 
-![command-processing-image](https://drive.google.com/uc?export=view&id=1BZPpn6kQ04mbLqGIGV3-RyjuZsk2c0ay)
+![command-processing-image](/images/command-request-response-flow.png)
 
 #### Getting Available Commands
 
