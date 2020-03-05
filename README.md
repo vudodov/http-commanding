@@ -1,12 +1,18 @@
-[![Nuget](https://img.shields.io/nuget/v/http-commanding-infrastructure?label=nuget-infrastructure)](https://www.nuget.org/packages/http-commanding-infrastructure/)
-
-[![Nuget](https://img.shields.io/nuget/v/http-commanding-middleware?label=nuget-middleware)](https://www.nuget.org/packages/http-commanding-middleware/)
+[![Nuget](https://img.shields.io/nuget/v/http-commanding-middleware)](https://www.nuget.org/packages/http-commanding-middleware/)
 # HTTP Commanding Middleware
 
 This is an easy-to-hook-up high-performance middleware for Web Applications aiming to implement the CQRS pattern. The Middleware provides tooling that will make your Web Application set up seamless and development efficient.
 
+The [Querying middleware](https://github.com/vudodov/http-querying) is available as a separate package. Take the adventage of the physical segregation. E.g. scale commands and queries independently. 
+
+## Usage
+All you need to do is register the middleware in your [middleware pipeline](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.1), add some queries and that's it.
+
+Spin up the project and hit the localhost with `command/<command-name>` add command data to the HTTP Request body and your command will be deserialized and delivered directly to the handler, once the command is executed success or failure result is formed and delivered back to you. For your convenience, you can find a ready-to-go playground inside the repository.
+
 ## The Playground
 Inside of the repository you can find [the Playground](https://github.com/vudodov/http-commanding/tree/master/HttpCommanding.Playground). Which is essentially a web application with a couple of preset commands and handlers for you to get quick hands-on experience.
+
 And [Some Tests](https://github.com/vudodov/http-commanding/tree/master/HttpCommanding.Playground.Tests) that will spin up a test application server and emulate client requests.
 
 ## Under the hood
