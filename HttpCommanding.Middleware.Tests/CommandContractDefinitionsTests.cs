@@ -38,7 +38,7 @@ namespace HttpCommanding.Middleware.Tests
             memoryCacheMock.Setup(memoryCache => memoryCache.CreateEntry(It.IsAny<string>()))
                 .Returns(cacheEntryMock);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async _ => { },
                 commandRegistryMock.Object,
                 memoryCacheMock.Object,
@@ -100,7 +100,7 @@ namespace HttpCommanding.Middleware.Tests
             memoryCacheMock.Setup(memoryCache => memoryCache.CreateEntry(It.IsAny<string>()))
                 .Returns(cacheEntryMock);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async _ => { },
                 commandRegistryMock.Object,
                 memoryCacheMock.Object,
@@ -149,7 +149,7 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(Mock.Of<ICacheEntry>());
 
             // Middleware setup
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async _ => { },
                 commandRegistryMock.Object,
                 memoryCacheMock.Object,
@@ -198,7 +198,7 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(Mock.Of<ICacheEntry>());
 
             // Middleware setup
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async _ => { },
                 commandRegistryMock.Object,
                 memoryCacheMock.Object,
@@ -241,7 +241,7 @@ namespace HttpCommanding.Middleware.Tests
             memoryCacheMock.Setup(memoryCache => memoryCache.CreateEntry(It.IsAny<string>()))
                 .Returns(cacheEntryMock);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async _ => { },
                 commandRegistryMock.Object,
                 memoryCacheMock.Object,
@@ -249,7 +249,7 @@ namespace HttpCommanding.Middleware.Tests
 
             
             var httpContext = new DefaultHttpContext();
-            var memotyStream = httpContext.Features.Get<IHttpResponseBodyFeature>().Stream;
+            var memoryStream = httpContext.Features.Get<IHttpResponseBodyFeature>().Stream;
             
             httpContext.Request.Path = "/command";
             httpContext.Request.Method = HttpMethods.Get;

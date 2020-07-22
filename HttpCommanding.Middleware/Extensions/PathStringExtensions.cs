@@ -8,9 +8,15 @@ namespace HttpCommanding.Middleware.Extensions
         public static (string middlewareIdentifier, string targetName) DecomposePath(this PathString pathString)
         {
             var pathParts = pathString.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            return pathParts.Length == 2
-                ? (pathParts[0], pathParts[1])
-                : (string.Empty, string.Empty);
+            switch (pathParts.Length)
+            {
+                case int length when length >= 2:
+                    return (pathParts[0], pathParts[1]);
+                case int length when length == 1:
+                    return (pathParts[0], string.Empty);
+                default:
+                    return (string.Empty, string.Empty);
+            }
         }
     }
 }

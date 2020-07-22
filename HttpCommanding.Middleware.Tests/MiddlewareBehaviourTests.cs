@@ -28,7 +28,7 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(true);
             var nextFlag = false;
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => nextFlag = true,
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),
@@ -56,7 +56,7 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(true);
             var nextFlag = false;
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => nextFlag = true,
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),
@@ -71,33 +71,6 @@ namespace HttpCommanding.Middleware.Tests
             await middleware.InvokeAsync(httpContext);
 
             nextFlag.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task It_should_throw_http_exception_if_wrong_http_method_is_called()
-        {
-            var mapping = (
-                command: typeof(TestSuccessfulCommand),
-                commandHandler: typeof(TestSuccessfulCommandHandler));
-            var registryMock = new Mock<ICommandRegistry>();
-            registryMock.Setup(registry => registry.TryGetValue("test-successful-command", out mapping))
-                .Returns(true);
-
-            var middleware = new Middleware(
-                async _ => { },
-                registryMock.Object,
-                Mock.Of<IMemoryCache>(),
-                Mock.Of<ILoggerFactory>());
-
-            var httpContext = new DefaultHttpContext();
-
-            httpContext.Request.ContentType = MediaTypeNames.Application.Json;
-            httpContext.Request.Path = "/command/test-successful-command";
-            httpContext.Request.Method = "PUT";
-
-            Func<Task> action = async () => await middleware.InvokeAsync(httpContext);
-
-            await action.Should().ThrowAsync<HttpRequestException>();
         }
     }
 }

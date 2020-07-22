@@ -30,7 +30,7 @@ namespace HttpCommanding.Middleware.Tests
             registryMock.Setup(registry => registry.TryGetValue("test-successful-command", out mapping))
                 .Returns(true);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => { },
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),
@@ -76,7 +76,7 @@ namespace HttpCommanding.Middleware.Tests
             registryMock.Setup(registry => registry.TryGetValue("test-failing-command", out mapping))
                 .Returns(true);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => { },
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),

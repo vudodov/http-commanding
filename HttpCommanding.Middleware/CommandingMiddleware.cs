@@ -33,8 +33,8 @@ namespace HttpCommanding.Middleware
             PropertyNameCaseInsensitive = false
         };
 
-        public CommandingMiddleware(RequestDelegate next, ICommandRegistry registry, 
-            ILoggerFactory loggerFactory, IMemoryCache memoryCache)
+        public CommandingMiddleware(RequestDelegate next, ICommandRegistry registry, IMemoryCache memoryCache,
+            ILoggerFactory loggerFactory)
         {
             _next = next;
             _registry = registry;
@@ -54,8 +54,7 @@ namespace HttpCommanding.Middleware
                     var commandResult = await ExecuteCommand(httpContext, commandName, commandId);
                     SetCommandHttpResponse(httpContext, commandResult, commandId);
                     break;
-                case commandPathIdentifier when HttpMethods.IsGet(httpContext.Request.Method) &&
-                                                string.IsNullOrWhiteSpace(commandName):
+                case commandPathIdentifier when HttpMethods.IsGet(httpContext.Request.Method):
                     SetGetAllHttpResponse(httpContext);
                     break;
                 default:
@@ -79,7 +78,7 @@ namespace HttpCommanding.Middleware
                     httpContext.RequestServices, cancellationToken);
             }
 
-            throw new NullReferenceException($"Mediator request or request handler {commandName} was not found");
+            throw new NullReferenceException($"Command or command handler for {commandName} was not found");
         }
         
         private void SetCommandHttpResponse(HttpContext httpContext, CommandResult result, Guid commandId)
@@ -109,7 +108,7 @@ namespace HttpCommanding.Middleware
             {
                 commandContracts = new Dictionary<string, JsonElement>();
 
-                foreach (var (commandName, commandType, commandHandler) in _registry)
+                foreach (var (commandName, commandType, commandTypeHandler) in _registry)
                 {
                     var schema = JsonSchema.FromType(commandType);
                     commandContracts.Add(commandName, JsonDocument.Parse(schema.ToJson()).RootElement);
