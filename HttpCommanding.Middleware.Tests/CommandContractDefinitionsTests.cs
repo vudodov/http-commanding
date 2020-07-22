@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HttpCommanding.Infrastructure;
-using HttpCommanding.Middleware.Tests.MockedCommands;
+using HttpCommanding.Middleware.Tests.TestCommands;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
@@ -28,9 +28,9 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(new List<(string commandName, Type command, Type commandHandler)>
                 {
                     (
-                        commandName: "testSuccessfulCommand",
-                        command: typeof(TestSuccessfulCommand),
-                        commandHandler: typeof(TestSuccessfulCommandHandler))
+                        commandName: "successfulTestCommand",
+                        command: typeof(SuccessfulTestCommand),
+                        commandHandler: typeof(SuccessfulTestCommandHandler))
                 }.GetEnumerator());
 
             var cacheEntryMock = Mock.Of<ICacheEntry>();
@@ -65,9 +65,9 @@ namespace HttpCommanding.Middleware.Tests
                     JsonSerializer.SerializeToUtf8Bytes(
                         JsonDocument.Parse(@"
                 {
-                    ""testSuccessfulCommand"": {
+                    ""successfulTestCommand"": {
                         ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-                        ""title"": ""TestSuccessfulCommand"",
+                        ""title"": ""SuccessfulTestCommand"",
                         ""type"": ""object"",
                         ""additionalProperties"": false,
                         ""properties"": {
@@ -90,9 +90,9 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(new List<(string commandName, Type command, Type commandHandler)>
                 {
                     (
-                        commandName: "testSuccessfulCommand",
-                        command: typeof(TestSuccessfulCommand),
-                        commandHandler: typeof(TestSuccessfulCommandHandler))
+                        commandName: "successfulTestCommand",
+                        command: typeof(SuccessfulTestCommand),
+                        commandHandler: typeof(SuccessfulTestCommandHandler))
                 }.GetEnumerator());
 
             var cacheEntryMock = Mock.Of<ICacheEntry>();
@@ -122,7 +122,7 @@ namespace HttpCommanding.Middleware.Tests
             responseBodyStream.Position = 0;
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            httpContext.Response.Headers[HeaderNames.ETag].ToString().Should().Be("HGfGbyN2o2ta0l4csiITYQ==");
+            httpContext.Response.Headers[HeaderNames.ETag].ToString().Should().Be("sjNLocD8ap3ZER7IhQyrqQ==");
         }
         
         [Fact]
@@ -133,9 +133,9 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(new List<(string commandName, Type command, Type commandHandler)>
                 {
                     (
-                        commandName: "testSuccessfulCommand",
-                        command: typeof(TestSuccessfulCommand),
-                        commandHandler: typeof(TestSuccessfulCommandHandler))
+                        commandName: "successfulTestCommand",
+                        command: typeof(SuccessfulTestCommand),
+                        commandHandler: typeof(SuccessfulTestCommandHandler))
                 }.GetEnumerator());
             
             // Memory Cache setup
@@ -182,9 +182,9 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(new List<(string commandName, Type command, Type commandHandler)>
                 {
                     (
-                        commandName: "testSuccessfulCommand",
-                        command: typeof(TestSuccessfulCommand),
-                        commandHandler: typeof(TestSuccessfulCommandHandler))
+                        commandName: "successfulTestCommand",
+                        command: typeof(SuccessfulTestCommand),
+                        commandHandler: typeof(SuccessfulTestCommandHandler))
                 }.GetEnumerator());
             
             // Memory Cache setup
@@ -231,9 +231,9 @@ namespace HttpCommanding.Middleware.Tests
                 .Returns(new List<(string commandName, Type command, Type commandHandler)>
                 {
                     (
-                        commandName: "testSuccessfulCommand",
-                        command: typeof(TestSuccessfulCommand),
-                        commandHandler: typeof(TestSuccessfulCommandHandler))
+                        commandName: "successfulTestCommand",
+                        command: typeof(SuccessfulTestCommand),
+                        commandHandler: typeof(SuccessfulTestCommandHandler))
                 }.GetEnumerator());
 
             var cacheEntryMock = Mock.Of<ICacheEntry>();
@@ -253,7 +253,7 @@ namespace HttpCommanding.Middleware.Tests
             
             httpContext.Request.Path = "/command";
             httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers.Add(HeaderNames.IfNoneMatch, "HGfGbyN2o2ta0l4csiITYQ==");
+            httpContext.Request.Headers.Add(HeaderNames.IfNoneMatch, "sjNLocD8ap3ZER7IhQyrqQ==");
 
             await middleware.InvokeAsync(httpContext);
 

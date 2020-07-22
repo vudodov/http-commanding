@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -41,7 +43,7 @@ namespace HttpCommanding.Middleware
             _logger = loggerFactory.CreateLogger<CommandingMiddleware>();
             _memoryCache = memoryCache;
         }
-        
+
         public async Task InvokeAsync(HttpContext httpContext)
         {
             var (middlewareIdentifier, commandName) = httpContext.Request.Path.DecomposePath();
@@ -62,7 +64,7 @@ namespace HttpCommanding.Middleware
                     break;
             }
         }
-        
+
         private async Task<CommandResult> ExecuteCommand(HttpContext httpContext, string commandName, Guid commandId)
         {
             if (_registry.TryGetValue(commandName, out var requestTypeInformation))
@@ -73,31 +75,63 @@ namespace HttpCommanding.Middleware
                     requestType,
                     _jsonSerializerOptions,
                     cancellationToken);
-
-                return await requestTypeHandler.HandleCommand(request, commandId,
-                    httpContext.RequestServices, cancellationToken);
+                try
+                {
+                    return await requestTypeHandler.HandleCommand(request, commandId,
+                        httpContext.RequestServices, cancellationToken);
+                }
+                catch (TargetInvocationException e) when (e.InnerException is CommandExecutionException)
+                {
+                    // _logger.LogError(e.InnerException.Message);
+                    return CommandResult.Failure(e.InnerException.Message);
+                }
+                catch (TargetInvocationException e) when (e.InnerException is AggregateException aggregateException)
+                {
+                    return HandleAggregateException(aggregateException);
+                }
+                catch (AggregateException aggregateException)
+                {
+                    return HandleAggregateException(aggregateException);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
 
             throw new NullReferenceException($"Command or command handler for {commandName} was not found");
         }
-        
+
+        private CommandResult HandleAggregateException(AggregateException aggregateException)
+        {
+            // if aggregate exception contain only single CommandExecutionException, handle it, otherwise re-throw
+            var innerExceptions = aggregateException.Flatten().InnerExceptions;
+            if (innerExceptions.Count == 1 && innerExceptions[0] is CommandExecutionException)
+            {
+                // _logger.LogError(e.InnerException.Message);
+                return CommandResult.Failure(innerExceptions[0].Message);
+            }
+
+            throw aggregateException;
+        }
+
         private void SetCommandHttpResponse(HttpContext httpContext, CommandResult result, Guid commandId)
         {
             var commandResponse = HttpCommandResponse.CreatedResponse(result, commandId);
-            
+
             httpContext.Response.StatusCode = (int) commandResponse.ResponseCode;
             httpContext.Response.ContentType = MediaTypeNames.Application.Json;
             httpContext.Response.Headers["Cache-Control"] = "no-cache";
-            
+
             httpContext.Response.BodyWriter.Write(
                 JsonSerializer.SerializeToUtf8Bytes(commandResponse, commandResponse.GetType(),
                     _jsonSerializerOptions));
             httpContext.Response.BodyWriter.Complete();
         }
-        
+
         private void SetGetAllHttpResponse(HttpContext httpContext)
         {
-            string CalculateChecksum(byte[] bytes)
+            static string CalculateChecksum(byte[] bytes)
             {
                 using var md5 = MD5.Create();
                 return Convert.ToBase64String(md5.ComputeHash(bytes));

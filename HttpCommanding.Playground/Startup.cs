@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using HttpCommanding.Infrastructure;
 using HttpCommanding.Middleware;
 using HttpCommanding.Playground.Commands;
 using Microsoft.AspNetCore.Builder;
