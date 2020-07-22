@@ -8,20 +8,18 @@ namespace HttpCommanding.Middleware
     public abstract class HttpCommandResponse
     {
         protected Guid _commandId;
-        public Guid CommandId => _commandId;
-
         protected HttpStatusCode _responseCode;
+        
+        public Guid CommandId => _commandId;
         [JsonIgnore] public HttpStatusCode ResponseCode => _responseCode;
 
-        public static HttpCommandResponse CreatedResult(Infrastructure.CommandResult commandResult, Guid commandId)
+        public static HttpCommandResponse CreatedResponse(Infrastructure.CommandResult commandResult, Guid commandId)
         {
             return commandResult is Infrastructure.Succeed
                 ? (HttpCommandResponse) new HttpCommandSucceedResponse(commandId)
                 : (HttpCommandResponse) new HttpCommandRejectedResponse(commandId,
                     ((Infrastructure.Failed) commandResult).Reasons);
         }
-        
-        
     }
 
     public sealed class HttpCommandSucceedResponse : HttpCommandResponse

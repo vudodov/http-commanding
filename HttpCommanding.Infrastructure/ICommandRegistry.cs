@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace HttpCommanding.Infrastructure
 {
-    public interface ICommandRegistry : IEnumerable<(string commandName, Type command, Type commandHandler)>
+    public interface ICommandRegistry : IEnumerable<(string commandName, Type commandType, Type commandHandlerType)>
     {
-        (Type command, Type commandHandler) this[string command] { get; }
+        bool TryGetValue(string commandName, out (Type commandType, Type commandHandlerType) map);
     }
 }

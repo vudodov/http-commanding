@@ -38,11 +38,13 @@ namespace HttpCommanding.Infrastructure.Tests
         {
             var registry = new CommandRegistry(new[] {Assembly.GetAssembly(typeof(TestCommand))});
 
-            registry["test-command"].command.Should().BeAssignableTo<TestCommand>();
-            registry["test-command"].commandHandler.Should().BeAssignableTo<TestCommandHandler>();
-
-            registry["another-test-command"].command.Should().BeAssignableTo<AnotherTestCommand>();
-            registry["another-test-command"].commandHandler.Should().BeAssignableTo<AnotherTestCommandHandler>();
+            registry.TryGetValue("test-command", out var testMap).Should().BeTrue();
+            testMap.commandType.Should().Be(typeof(TestCommand));
+            testMap.commandHandlerType.Should().Be(typeof(TestCommandHandler));
+            
+            registry.TryGetValue("another-test-command", out var anotherTestMap).Should().BeTrue();
+            anotherTestMap.commandType.Should().Be(typeof(AnotherTestCommand));
+            anotherTestMap.commandHandlerType.Should().Be(typeof(AnotherTestCommandHandler));
         }
 
         [Fact]

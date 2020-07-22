@@ -9,12 +9,13 @@
         <Authors>Valerii Udodov &lt;vudodov@gmail.com&gt;</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
-        <PackageVersion>1.0.6</PackageVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <Title>HTTP Commanding Middleware</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>cqrs, commanding, http</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryType>GIT</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,9 +27,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
-      <PackageReference Include="NJsonSchema" Version="10.1.5" />
-      <PackageReference Include="System.Text.Json" Version="4.7.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
+      <PackageReference Include="NJsonSchema" Version="10.1.24" />
+      <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
 </Project>

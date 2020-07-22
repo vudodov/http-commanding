@@ -23,12 +23,14 @@ namespace HttpCommanding.Middleware.Tests
         [Fact]
         public async Task It_should_succeed_if_handler_finished_successfully()
         {
+            var mapping = (
+                command: typeof(TestSuccessfulCommand),
+                commandHandler: typeof(TestSuccessfulCommandHandler));
             var registryMock = new Mock<ICommandRegistry>();
-            registryMock.SetupGet(p => p["test-successful-command"])
-                .Returns((command: typeof(TestSuccessfulCommand),
-                    commandHandler: typeof(TestSuccessfulCommandHandler)));
+            registryMock.Setup(registry => registry.TryGetValue("test-successful-command", out mapping))
+                .Returns(true);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => { },
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),
@@ -67,12 +69,14 @@ namespace HttpCommanding.Middleware.Tests
         [Fact]
         public async Task It_should_fail_if_handler_finished_unsuccessfully()
         {
+            var mapping = (
+                command: typeof(TestFailingCommand),
+                commandHandler: typeof(TestFailingCommandHandler));
             var registryMock = new Mock<ICommandRegistry>();
-            registryMock.SetupGet(p => p["test-failing-command"])
-                .Returns((command: typeof(TestFailingCommand),
-                    commandHandler: typeof(TestFailingCommandHandler)));
+            registryMock.Setup(registry => registry.TryGetValue("test-failing-command", out mapping))
+                .Returns(true);
 
-            var middleware = new Middleware(
+            var middleware = new CommandingMiddleware(
                 async context => { },
                 registryMock.Object,
                 Mock.Of<IMemoryCache>(),

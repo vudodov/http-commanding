@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
         <OutputType>Library</OutputType>
         <Nullable>enable</Nullable>
         <PackageId>http-commanding-infrastructure</PackageId>
@@ -9,7 +9,7 @@
         <Authors>Valerii Udodov</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
-        <PackageVersion>1.0.6</PackageVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <Title>HTTP Commanding Infrastructure</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>cqrs, commanding, http</PackageTags>

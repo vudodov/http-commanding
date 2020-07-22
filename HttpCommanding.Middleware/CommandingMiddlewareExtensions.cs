@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HttpCommanding.Middleware
 {
-    public static class Extensions
+    public static class CommandingMiddlewareExtensions
     {
         public static IApplicationBuilder UseHttpCommanding(this IApplicationBuilder builder)
-            => builder.UseMiddleware<Middleware>();
+            => builder.UseMiddleware<CommandingMiddleware>();
 
         public static void AddHttpCommanding(this IServiceCollection serviceCollection, params Assembly[] assemblies)
         {
