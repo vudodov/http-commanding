@@ -9,12 +9,13 @@
         <Authors>Valerii Udodov &lt;vudodov@gmail.com&gt;</Authors>
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
-        <PackageVersion>1.0.6</PackageVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <Title>HTTP Commanding Middleware</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>cqrs, commanding, http</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryType>GIT</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
