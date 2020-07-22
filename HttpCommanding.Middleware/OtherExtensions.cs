@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HttpCommanding.Middleware
 {
-    public static class Extensions
+    public static class OtherExtensions
     {
         public static IApplicationBuilder UseHttpCommanding(this IApplicationBuilder builder)
             => builder.UseMiddleware<Middleware>();

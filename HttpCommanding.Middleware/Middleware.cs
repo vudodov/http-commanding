@@ -50,7 +50,7 @@ namespace HttpCommanding.Middleware
 
                 void SetResponse(CommandResult result)
                 {
-                    var httpCommandResult = HttpCommandResponse.CreatedResult(result, commandId);
+                    var httpCommandResult = HttpCommandResponse.CreatedResponse(result, commandId);
                     httpContext.Response.StatusCode = (int) httpCommandResult.ResponseCode;
 
                     httpContext.Response.ContentType = MediaTypeNames.Application.Json;
@@ -61,10 +61,10 @@ namespace HttpCommanding.Middleware
                     httpContext.Response.Headers["Cache-Control"] = "no-cache";
                 }
 
-                var commandMap = _commandRegistry[commandName];
+                _commandRegistry.TryGetValue(commandName, out var commandMap);
 
                 var response = await CommandHandlerExecutor.Execute(
-                    commandMap.command, commandMap.commandHandler, commandId,
+                    commandMap.commandType, commandMap.commandHandlerType, commandId,
                     httpContext.Request.BodyReader, httpContext.RequestServices,
                     httpContext.RequestAborted, _jsonSerializerOptions);
 
