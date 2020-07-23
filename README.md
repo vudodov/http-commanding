@@ -97,7 +97,7 @@ public void ConfigureServices(IServiceCollection services)
 #### Sending Commands
 
 To hit the middleware with a command all you need is [properly constructed HTTP request](
-https://valerii-udodov.com/2020/02/19/cqrs-commanding-via-http/). 
+https://valerii-udodov.com/cqrs-commanding-via-http/). 
 The request should have 
  - a `POST` request type;
  - URI as following `http://<your-host>/command/<command-name>`;
