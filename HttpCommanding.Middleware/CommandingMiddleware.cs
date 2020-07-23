@@ -67,17 +67,17 @@ namespace HttpCommanding.Middleware
 
         private async Task<CommandResult> ExecuteCommand(HttpContext httpContext, string commandName, Guid commandId)
         {
-            if (_registry.TryGetValue(commandName, out var requestTypeInformation))
+            if (_registry.TryGetValue(commandName, out var commandTypeInformation))
             {
-                var (requestType, requestTypeHandler) = requestTypeInformation;
+                var (commandType, commandTypeHandler) = commandTypeInformation;
                 var cancellationToken = httpContext.RequestAborted;
-                var request = await httpContext.Request.BodyReader.DeserializeBodyAsync(
-                    requestType,
+                var command = await httpContext.Request.BodyReader.DeserializeBodyAsync(
+                    commandType,
                     _jsonSerializerOptions,
                     cancellationToken);
                 try
                 {
-                    return await requestTypeHandler.HandleCommand(request, commandId,
+                    return await commandTypeHandler.HandleCommand(command, commandId,
                         httpContext.RequestServices, cancellationToken);
                 }
                 catch (TargetInvocationException e) when (e.InnerException is CommandExecutionException)
@@ -92,10 +92,6 @@ namespace HttpCommanding.Middleware
                 catch (AggregateException aggregateException)
                 {
                     return HandleAggregateException(aggregateException);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
                 }
             }
 
