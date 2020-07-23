@@ -9,6 +9,9 @@ namespace HttpCommanding.Middleware
     {
         public static IApplicationBuilder UseHttpCommanding(this IApplicationBuilder builder)
             => builder.UseMiddleware<CommandingMiddleware>();
+        
+        public static IApplicationBuilder UseHttpCommanding(this IApplicationBuilder builder, ICommandRegistry commandRegistry)
+            => builder.UseMiddleware<CommandingMiddleware>(commandRegistry);
 
         public static void AddHttpCommanding(this IServiceCollection serviceCollection, params Assembly[] assemblies)
         {
