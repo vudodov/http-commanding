@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -21,11 +20,13 @@ namespace HttpCommanding.Middleware
     public class CommandingMiddleware
     {
         private const string CacheKeyCommandContracts = "command-contracts";
+        private const string commandPathIdentifier = "command";
+        
         private readonly IMemoryCache _memoryCache;
         private readonly ICommandRegistry _registry;
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
-        private const string commandPathIdentifier = "command";
+        private string _cacheKey;
 
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -42,6 +43,13 @@ namespace HttpCommanding.Middleware
             _registry = registry;
             _logger = loggerFactory.CreateLogger<CommandingMiddleware>();
             _memoryCache = memoryCache;
+            _cacheKey = CacheKeyCommandContracts;
+        }
+
+        public CommandingMiddleware(RequestDelegate next, ICommandRegistry registry, string cacheKey, IMemoryCache memoryCache,
+            ILoggerFactory loggerFactory) : this(next, registry, memoryCache, loggerFactory)
+        {
+            _cacheKey = cacheKey;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -133,7 +141,7 @@ namespace HttpCommanding.Middleware
                 return Convert.ToBase64String(md5.ComputeHash(bytes));
             }
 
-            if (!_memoryCache.TryGetValue(CacheKeyCommandContracts,
+            if (!_memoryCache.TryGetValue(_cacheKey,
                 out Dictionary<string, JsonElement> commandContracts))
             {
                 commandContracts = new Dictionary<string, JsonElement>();
@@ -144,7 +152,7 @@ namespace HttpCommanding.Middleware
                     commandContracts.Add(commandName, JsonDocument.Parse(schema.ToJson()).RootElement);
                 }
 
-                using var cacheEntry = _memoryCache.CreateEntry(CacheKeyCommandContracts);
+                using var cacheEntry = _memoryCache.CreateEntry(_cacheKey);
                 cacheEntry.Value = commandContracts;
             }
 
