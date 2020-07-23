@@ -16,6 +16,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <RepositoryType>GIT</RepositoryType>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,6 +30,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
       <PackageReference Include="NJsonSchema" Version="10.1.24" />
+      <PackageReference Include="System.IO.Pipelines" Version="4.7.2" />
       <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
