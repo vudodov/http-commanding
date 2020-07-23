@@ -29,7 +29,6 @@ namespace HttpCommanding.Middleware.Tests
             var middleware = new CommandingMiddleware(
                 async context => nextFlag = true,
                 registryMock.Object,
-                null,
                 Mock.Of<IMemoryCache>(),
                 Mock.Of<ILoggerFactory>());
 
