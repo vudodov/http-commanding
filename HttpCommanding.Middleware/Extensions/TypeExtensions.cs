@@ -12,11 +12,11 @@ namespace HttpCommanding.Middleware.Extensions
         internal static async Task<CommandResult> HandleCommand(this Type commandHandlerType, object? command, Guid commandId,
             IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
-            object requestHandlerInstance = ActivatorUtilities.CreateInstance(serviceProvider, commandHandlerType);
+            object commandHandlerInstance = ActivatorUtilities.CreateInstance(serviceProvider, commandHandlerType);
             MethodInfo handleAsyncMethod = commandHandlerType.GetHandleAsyncMethod();
             
             var invocationTask = handleAsyncMethod.InvokeAndReturn(
-                requestHandlerInstance,
+                commandHandlerInstance,
                 command!,
                 commandId,
                 cancellationToken);

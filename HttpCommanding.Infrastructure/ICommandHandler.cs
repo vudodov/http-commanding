@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace HttpCommanding.Infrastructure
 {
-    public interface ICommandHandler<in TCommand>
+    public interface ICommandHandler <in TCommand>
         where TCommand : ICommand
     {
         Task<CommandResult> HandleAsync(TCommand command, Guid commandId, CancellationToken token);
